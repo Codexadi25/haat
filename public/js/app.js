@@ -601,6 +601,10 @@
   async function adminStoreDetail() {
     const box = document.createElement('div');
     const sid = root.dataset.storeId;
+    if (!sid) {
+      box.innerHTML = `<div class="card empty"><b>No store selected</b><p style="color:var(--ink-2);margin-top:8px">Please go to the <a href="#stores" onclick="go('stores')">Stores</a> tab and select a store to manage.</p></div>`;
+      return box;
+    }
     try {
       const s = await api('/admin/stores/' + sid);
       const reload = () => go('store-detail');

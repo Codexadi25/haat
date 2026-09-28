@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 const id = z.string().regex(/^[a-f\d]{24}$/i, 'Invalid id');
-const phone = z.string().trim().regex(/^(?:\+91[- ]?)?[6-9]\d{9}$/, 'Enter a 10-digit Indian mobile number');
+const phone = z.string().trim().transform(v => v.replace(/[\s-]/g, '')).pipe(z.string().regex(/^(?:\+91)?[6-9]\d{9}$/, 'Enter a 10-digit Indian mobile number'));
 const pincode = z.string().trim().regex(/^\d{6}$/, 'Enter a 6-digit pincode');
 const password = z.string().min(8, 'Use at least 8 characters').max(72);
 const email = z.string().trim().toLowerCase().email('Enter a valid email');
