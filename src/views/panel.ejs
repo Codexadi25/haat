@@ -1,0 +1,19 @@
+<div class="app" data-role="<%= role %>" data-name="<%= me.name %>" data-storefront="<%= typeof storefront !== 'undefined' ? storefront : '' %>" data-store-id="<%= typeof storeId !== 'undefined' ? storeId : '' %>">
+  <aside class="side">
+    <a class="brand" href="/"><span class="brand-mark">H</span><span><%= appName %></span></a>
+    <nav class="nav" id="nav" aria-label="Sections"></nav>
+    <div class="side-foot">
+      <div class="who"><span class="avatar"><%= me.name.charAt(0).toUpperCase() %></span><div><b><%= me.name %></b><small><%= { admin: 'Administrator', mx: 'Store owner', dp: 'Delivery partner', cx: 'Customer' }[role] %></small></div></div>
+      <div class="foot-actions">
+        <button class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle dark mode"><svg class="i sun"><use href="#i-sun"/></svg><svg class="i moon"><use href="#i-moon"/></svg></button>
+        <button class="btn" id="logout"><svg class="i"><use href="#i-out"/></svg><span>Sign out</span></button>
+      </div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="top"><div><h1 id="title"></h1><p id="sub"></p></div><div id="topActions"></div></header>
+    <div id="view" class="view" aria-live="polite"></div>
+  </main>
+</div>
+<dialog id="modal" aria-modal="true"></dialog>
+<div id="toasts" aria-live="polite"></div>

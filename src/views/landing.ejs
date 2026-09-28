@@ -1,0 +1,16 @@
+<div class="land">
+  <header>
+    <a class="brand" href="/"><span class="brand-mark">H</span><span><%= appName %></span></a>
+    <button class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle dark mode"><svg class="i sun"><use href="#i-sun"/></svg><svg class="i moon"><use href="#i-moon"/></svg></button>
+  </header>
+  <main>
+    <h1>Every local store, one dependable marketplace.</h1>
+    <p class="lead">Onboard stores, list products, take payments and dispatch deliveries from one calm workspace. Nothing you record is ever lost, so returns and replacements always have the full story.</p>
+    <div class="row">
+      <% if (me) { %><a class="btn primary" href="<%= home %>">Open your workspace</a>
+      <% } else { %><a class="btn primary" href="/login">Sign in</a><% } %>
+      <a class="btn" href="/api/v2/products">Browse the product API</a>
+    </div>
+  </main>
+  <footer><span>Stores, delivery partners and admins sign in here. Customers order on the storefront.</span></footer>
+</div>

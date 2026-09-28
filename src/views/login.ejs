@@ -1,0 +1,42 @@
+<div class="auth-wrap">
+  <section class="auth-art" aria-hidden="true">
+    <span class="orb a"></span><span class="orb b"></span><span class="orb c"></span>
+    <a class="brand" href="/"><span class="brand-mark">H</span><span><%= appName %></span></a>
+    <div>
+      <h1>Run the store. We handle the rest.</h1>
+      <p>Products, orders and deliveries stay organised, and every past order keeps its details.</p>
+    </div>
+  </section>
+  <section class="auth-form">
+    <div class="auth-top"><button class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle dark mode"><svg class="i sun"><use href="#i-sun"/></svg><svg class="i moon"><use href="#i-moon"/></svg></button></div>
+    <div class="auth-card">
+      <div><h2>Welcome back</h2><p style="color:var(--ink-2);margin-top:6px">Sign in with the email you were onboarded with.</p></div>
+      <div class="seg" role="group" aria-label="Account type">
+        <button type="button" data-kind="team" aria-pressed="true">Store, delivery or customer</button>
+        <button type="button" data-kind="admin" aria-pressed="false">Admin</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="username" required autofocus></label>
+        <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+        <div class="form-error" id="err" role="alert"></div>
+        <button class="btn primary" id="go">Sign in</button>
+      </form>
+      <button type="button" class="text-btn" id="forgotPassword">Forgot password?</button>
+      <form id="resetRequest" hidden>
+        <p style="color:var(--ink-2)">Enter your registered email address. We will send a reset link if an account matches.</p>
+        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+        <div class="form-error" id="resetRequestErr" role="alert"></div>
+        <p id="resetRequestMessage" role="status"></p>
+        <button class="btn primary">Send reset link</button>
+        <button type="button" class="text-btn resetBack">Back to sign in</button>
+      </form>
+      <form id="resetConfirm" hidden>
+        <p style="color:var(--ink-2)">Choose a new password. Reset links expire after five minutes.</p>
+        <label class="field"><span>New password</span><input type="password" name="password" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+        <div class="form-error" id="resetConfirmErr" role="alert"></div>
+        <button class="btn primary">Update password</button>
+        <button type="button" class="text-btn resetBack">Back to sign in</button>
+      </form>
+    </div>
+  </section>
+</div>
