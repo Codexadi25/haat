@@ -82,8 +82,8 @@ input[type='checkbox'] { width: 20px; min-height: 20px; height: 20px; accent-col
 .form-error:empty { display: none; }
 
 /* ---------- Auth ---------- */
-body.auth { min-height: 100vh; }
-.auth-wrap { display: grid; grid-template-columns: 1.1fr 1fr; min-height: 100vh; }
+body.auth { height: 100vh; overflow: hidden; margin: 0; }
+.auth-wrap { display: grid; grid-template-columns: 1.1fr 1fr; height: 100vh; overflow: hidden; }
 .auth-art {
   position: relative; overflow: hidden; padding: 56px; display: flex; flex-direction: column; justify-content: space-between;
   background: linear-gradient(160deg, #0B403C 0%, #0E5A55 55%, #12716A 100%); color: #F3FBF9;
@@ -95,8 +95,8 @@ body.auth { min-height: 100vh; }
 .orb.b { width: 300px; height: 300px; background: #3FC7AE; left: -60px; bottom: 6%; animation-delay: -6s; }
 .orb.c { width: 200px; height: 200px; background: #7AA7F0; right: 22%; bottom: 20%; opacity: .32; animation-delay: -11s; }
 @keyframes drift { to { transform: translate3d(40px, -34px, 0) scale(1.12); } }
-.auth-art > * { position: relative; z-index: 1; }
-.auth-form { display: grid; place-items: center; padding: 32px 24px; position: relative; }
+.auth-art > *:not(.orb) { position: relative; z-index: 1; }
+.auth-form { display: grid; place-items: center; padding: 32px 24px; position: relative; overflow-y: auto; height: 100%; }
 .auth-card { width: min(420px, 100%); display: grid; gap: 22px; animation: rise .6s cubic-bezier(.2, .8, .2, 1) both; }
 .auth-card h2 { font-size: 30px; }
 .auth-card form { display: grid; gap: 16px; }
