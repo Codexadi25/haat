@@ -359,12 +359,12 @@
   }
 
   /* ---------- Orders ---------- */
-  const line = (t, s) => `${esc(t)}${s ? `<small>${esc(s)}</small>` : ''}`;
+  const line = (t, s) => `${esc(t)}${s ? `<small>${s}</small>` : ''}`;
   function orderCols() {
     const c = [{ h: 'Order', c: (r) => `<b>${copyHtml(r.orderNo)}</b><small>${dt(r.createdAt)}</small>` }];
     if (ROLE !== 'cx') c.push({ h: 'Customer', c: (r) => line(r.customerSnapshot?.name, copyHtml(r.customerSnapshot?.phone)) });
-    if (ROLE !== 'mx') c.push({ h: 'Store', c: (r) => line(r.storeSnapshot?.name, r.storeSnapshot?.address?.city) });
-    if (ROLE === 'dp') c.push({ h: 'Deliver to', c: (r) => line(r.address?.line1, `${r.address?.city || ''} ${r.address?.pincode || ''}`) });
+    if (ROLE !== 'mx') c.push({ h: 'Store', c: (r) => line(r.storeSnapshot?.name, esc(r.storeSnapshot?.address?.city)) });
+    if (ROLE === 'dp') c.push({ h: 'Deliver to', c: (r) => line(r.address?.line1, esc(`${r.address?.city || ''} ${r.address?.pincode || ''}`)) });
     if (ROLE === 'admin') c.push({ h: 'Partner', c: (r) => esc(r.dpSnapshot?.name || '—') });
     c.push({ h: 'Items', c: (r) => r.items.reduce((n, i) => n + i.qty, 0) }, { h: 'Total', c: (r) => `<b>${inr(r.amounts.total)}</b>` }, { h: 'Status', c: (r) => pill(r.status) });
     return c;
@@ -676,7 +676,7 @@
           { label: p.isListed ? 'Unlist' : 'List', run: async (r, reload) => { await api(`/admin/products/${r._id}`, { method: 'PATCH', body: { isListed: !r.isListed } }); toast(r.isListed ? 'Unlisted' : 'Listed'); reload(); } },
           { label: 'Remove', cls: 'danger', run: (r, reload) => confirmBox('Remove this product?', 'It leaves your store page but stays on record.', 'Move to bin', async () => { await api(`/admin/products/${r._id}`, { method: 'DELETE' }); toast('Moved to bin'); reload(); }) },
         ],
-      })());
+      }));
     } catch (e) { box.innerHTML = `<div class="card empty"><b>No store found</b>${esc(e.message)}</div>`; }
     return box;
   }
