@@ -6,7 +6,7 @@
   const HOME = { admin: '/admin', mx: '/mx', dp: '/dp', cx: '/account' };
 
   function showReset(mode) {
-    form.hidden = mode !== 'login'; forgot.hidden = mode !== 'login' || kind === 'admin';
+    form.hidden = mode !== 'login'; forgot.hidden = mode !== 'login';
     resetRequest.hidden = mode !== 'request'; resetConfirm.hidden = mode !== 'confirm';
   }
   forgot.addEventListener('click', () => showReset('request'));
@@ -16,7 +16,6 @@
   document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
     kind = b.dataset.kind;
     document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    forgot.hidden = kind === 'admin';
     err.textContent = '';
   }));
 
@@ -38,7 +37,7 @@
     e.preventDefault(); const error = document.getElementById('resetRequestErr'); const message = document.getElementById('resetRequestMessage');
     error.textContent = ''; message.textContent = '';
     try {
-      const r = await fetch('/api/v2/auth/password-reset/request', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, body: JSON.stringify({ email: resetRequest.elements.email.value }) });
+      const r = await fetch('/api/v2/auth/password-reset/request', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, body: JSON.stringify({ identifier: resetRequest.elements.identifier.value }) });
       const j = await r.json(); if (!r.ok) throw new Error(j.message || 'Could not request a reset link');
       message.textContent = j.data.message;
     } catch (x) { error.textContent = x.message; }

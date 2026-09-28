@@ -16,15 +16,15 @@
         <button type="button" data-kind="admin" aria-pressed="false">Admin</button>
       </div>
       <form id="loginForm" novalidate>
-        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="username" required autofocus></label>
-        <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="username" required autofocus placeholder="example@domain.com"></label>
+        <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required placeholder="********"></label>
         <div class="form-error" id="err" role="alert"></div>
         <button class="btn primary" id="go">Sign in</button>
       </form>
       <button type="button" class="text-btn" id="forgotPassword">Forgot password?</button>
       <form id="resetRequest" hidden>
-        <p style="color:var(--ink-2)">Enter your registered email address. We will send a reset link if an account matches.</p>
-        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+        <p style="color:var(--ink-2)">Enter your registered email address or phone number. We will send a reset link to your email if an account matches.</p>
+        <label class="field"><span>Email or Phone</span><input type="text" name="identifier" required placeholder="your@email.com OR +91-XXXXXXXXXX"></label>
         <div class="form-error" id="resetRequestErr" role="alert"></div>
         <p id="resetRequestMessage" role="status"></p>
         <button class="btn primary">Send reset link</button>

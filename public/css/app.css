@@ -107,7 +107,7 @@ body.auth { height: 100vh; overflow: hidden; margin: 0; }
 .brand-mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--gold); color: #1B1405; font: 700 19px var(--font-display); }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); }
 .seg button { border: 0; background: transparent; color: var(--ink-2); font: 600 14px var(--font-body); min-height: 36px; border-radius: 9px; cursor: pointer; transition: background-color .25s, color .25s, box-shadow .25s; }
-.seg button[aria-pressed='true'] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.seg button[aria-pressed='true'] { background: var(--brand); color: #fff; box-shadow: var(--shadow); }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
 /* ---------- Landing ---------- */

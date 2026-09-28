@@ -30,8 +30,24 @@ router.post('/login', loginLimiter, validate(v.login), asyncHandler(async (req, 
 
 router.post('/password-reset/request', loginLimiter, validate(v.passwordResetRequest), asyncHandler(async (req, res) => {
   if (!email.isConfigured) throw new ApiError(503, 'Password reset email is not configured. Contact an administrator.');
-  const user = await User.findOne({ email: req.body.email, role: { $ne: 'admin' } }).select('_id email');
-  if (user) {
+  const identifier = req.body.identifier;
+  const users = await User.find({ 
+    $or: [{ email: identifier.toLowerCase() }, { phone: identifier.replace(/[\s-]/g, '') }]
+  }).select('_id email');
+
+  if (users.length > 1) {
+    const mask = (e) => {
+      const [local, domain] = e.split('@');
+      const mLocal = local.length > 4 ? local.slice(0, 2) + '*'.repeat(local.length - 4) + local.slice(-2) : local;
+      const mDomain = domain.length > 4 ? domain.slice(0, 2) + '*'.repeat(domain.length - 4) + domain.slice(-2) : domain;
+      return `${mLocal}@${mDomain}`;
+    };
+    const choices = users.map(u => mask(u.email)).join(', ');
+    throw new ApiError(400, `Multiple accounts found for this phone number. Please enter your email address directly. (Hint: ${choices})`);
+  }
+
+  if (users.length === 1) {
+    const user = users[0];
     const token = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     await User.updateOne({ _id: user._id }, { $set: { passwordResetTokenHash: tokenHash, passwordResetExpiresAt: new Date(Date.now() + 5 * 60 * 1000) } });

@@ -57,7 +57,7 @@ const productUpdate = z.object(productFields).partial().strict().refine(mrpCheck
 const s = {
   register: z.object({ name: z.string().trim().min(2).max(80), email, phone, password }),
   login: z.object({ email, password: z.string().min(1).max(72) }),
-  passwordResetRequest: z.object({ email }),
+  passwordResetRequest: z.object({ identifier: z.string().trim().min(1) }),
   passwordResetConfirm: z.object({ token: z.string().regex(/^[a-f\d]{64}$/i), password }),
   profile: z.object({ name: z.string().trim().min(2).max(80), phone, addresses: z.array(address).max(10) }).partial().strict(),
   storeUpdate, productCreate, productUpdate,
