@@ -1,0 +1,46 @@
+<% 
+  const cls = f.full ? ' full' : ''; 
+  const hintHtml = f.hint ? `<small>${esc(f.hint)}</small>` : ''; 
+  const req = f.required ? 'required' : ''; 
+%>
+<% if (f.type === 'checkbox') { %>
+  <label class="check<%= cls %>"><input type="checkbox" name="<%= f.name %>" <%= f.value ? 'checked' : '' %>> <%= f.label %></label>
+<% } else if (f.type === 'textarea' || f.type === 'lines') { %>
+  <div class="field<%= cls %>">
+    <span><%= f.label %></span>
+    <textarea name="<%= f.name %>" <%= req %>><%= v %></textarea>
+    <%- hintHtml %>
+  </div>
+<% } else if (f.type === 'select') { %>
+  <div class="field<%= cls %>">
+    <span><%= f.label %></span>
+    <select name="<%= f.name %>" <%= req %>>
+      <% for (const [k, l] of f.options) { %>
+        <option value="<%= k %>" <%= String(k) === String(v) ? 'selected' : '' %>><%= l %></option>
+      <% } %>
+    </select>
+    <%- hintHtml %>
+  </div>
+<% } else if (f.type === 'hours') { %>
+  <div class="field<%= cls %>">
+    <span><%= f.label %></span>
+    <%- ctl %>
+    <%- hintHtml %>
+  </div>
+<% } else if (f.type === 'images') { %>
+  <div class="field<%= cls %>">
+    <span><%= f.label %></span>
+    <div class="image-upload-widget" data-name="<%= f.name %>">
+      <input type="hidden" name="<%= f.name %>" value="<%= v %>">
+      <div class="iu-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+      <input type="file" accept="image/*" class="iu-file" <%= req && (!v || !v.length) ? 'required' : '' %>>
+    </div>
+    <%- hintHtml %>
+  </div>
+<% } else { %>
+  <label class="field<%= cls %>">
+    <span><%= f.label %></span>
+    <input name="<%= f.name %>" type="<%= type === 'money' ? 'number' : type === 'phone' ? 'text' : type %>" <%= type === 'money' ? 'step="0.01" min="0"' : '' %> <%= type === 'number' ? 'min="0"' : '' %> <%= type === 'phone' ? 'data-is-phone="true"' : '' %> value="<%= v %>" <%= req %> autocomplete="off">
+    <%- hintHtml %>
+  </label>
+<% } %>

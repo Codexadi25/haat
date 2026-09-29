@@ -13,6 +13,8 @@ const { loginLimiter } = require('./auth');
 const { asyncHandler, ok, ApiError, listQuery, uniqueSlug } = require('../utils/helpers');
 const { cached, revokeToken, del } = require('../utils/cache');
 const { redis } = require('../config/redis');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 // ---- Admin login (only admins may sign in here) ----
 router.post('/login', loginLimiter, validate(v.login), asyncHandler(async (req, res) => {
@@ -99,6 +101,86 @@ router.post('/onboard/mx', validate(v.onboardMx), asyncHandler(async (req, res) 
   
   await catalog.bustCaches();
   ok(res, { user, store: created, temporaryPassword: password ? undefined : pwd }, 201);
+}));
+
+router.post('/onboard/bulk', upload.single('file'), asyncHandler(async (req, res) => {
+  if (!req.file) throw new ApiError(400, 'No file uploaded');
+  const txt = req.file.buffer.toString('utf-8');
+  const lines = txt.split(/\r?\n/).filter(x => x.trim() !== '');
+  if (lines.length < 2) throw new ApiError(400, 'Empty file or no data rows');
+  
+  const separator = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].split(separator).map(x => x.trim().toLowerCase());
+  
+  const getIdx = (name) => headers.findIndex(h => h === name);
+  const titleIdx = getIdx('title');
+  const addressIdx = getIdx('address');
+  const streetIdx = getIdx('street');
+  const muniIdx = getIdx('municipality');
+  const catIdx = getIdx('categories');
+  const phoneIdx = getIdx('phone');
+  const latIdx = getIdx('latitude');
+  const lngIdx = getIdx('longitude');
+  const hoursIdx = getIdx('opening_hours');
+  
+  if (titleIdx === -1) throw new ApiError(400, 'Missing "title" column');
+  
+  const getCityCode = (city = '') => {
+    const cityCodes = { "kanpur nagar": "KNP", "kanpur": "KNP", "mumbai": "MUM", "delhi": "DEL", "new delhi": "NDL", "bengaluru": "BLR", "bangalore": "BLR" };
+    const c = city.toLowerCase().trim();
+    if (cityCodes[c]) return cityCodes[c];
+    const consonants = c.replace(/[^a-z]/g, '').replace(/[aeiou]/g, '');
+    return (consonants.substring(0, 3) + 'XXX').substring(0, 3).toUpperCase();
+  };
+  
+  const results = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(separator).map(x => x.trim());
+    if (parts.length < headers.length && parts.join('') === '') continue;
+    
+    const title = parts[titleIdx];
+    if (!title) continue;
+    
+    const phone = phoneIdx !== -1 ? parts[phoneIdx] : '';
+    const name = title.substring(0, 80);
+    const email = (phone || Math.random().toString(36).substring(7)) + '@temp.haat.local';
+    
+    const city = (muniIdx !== -1 ? parts[muniIdx] : 'Unknown').split(',')[0];
+    const count = await Store.countDocuments({ 'address.city': city }).setOptions({ withDeleted: true }) + 1;
+    const storeCode = `MX${getCityCode(city)}${count.toString().padStart(4, '0')}C`;
+    
+    const u = { name, email, phone, role: 'mx' };
+    const pwd = tempPassword();
+    
+    const storeObj = {
+      name: title,
+      category: catIdx !== -1 ? parts[catIdx] : 'general',
+      phone: phone,
+      address: {
+        line1: addressIdx !== -1 ? parts[addressIdx] : '',
+        line2: streetIdx !== -1 ? parts[streetIdx] : '',
+        city: city
+      },
+      openingHours: hoursIdx !== -1 ? parts[hoursIdx] : ''
+    };
+    
+    if (latIdx !== -1 && lngIdx !== -1 && parts[latIdx] && parts[lngIdx]) {
+      storeObj.location = { type: 'Point', coordinates: [parseFloat(parts[lngIdx]), parseFloat(parts[latIdx])] };
+    }
+    
+    let user; let created;
+    [user] = await User.create([{ ...u, role: 'mx', passwordHash: await User.hash(pwd), onboardedBy: req.user.id }]);
+    try {
+      [created] = await Store.create([{ ...storeObj, storeCode, owner: user._id, slug: await uniqueSlug(Store, storeObj.name), status: 'approved' }]);
+      results.push({ store: created.name, code: storeCode });
+    } catch (err) {
+      await User.collection.deleteOne({ _id: user._id });
+    }
+  }
+  
+  await catalog.bustCaches();
+  ok(res, { processed: results.length, stores: results }, 201);
 }));
 
 router.post('/onboard/dp', validate(v.onboardDp), asyncHandler(async (req, res) => {

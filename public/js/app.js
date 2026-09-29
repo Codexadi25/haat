@@ -44,7 +44,7 @@
   }
   const dlg = $('#modal');
   dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
-  const shell = (title, body, foot = '') => `<div class="dlg"><header><h2>${esc(title)}</h2><button type="button" class="icon-btn" data-close aria-label="Close">✕</button></header><div class="dlg-body">${body}</div><footer>${foot}</footer></div>`;
+  const shell = (title, body, foot = '') => ejs.render(document.getElementById('tpl-modal').innerHTML, { title, body, foot });
 
   function fieldHtml(f) {
     const cls = f.full ? ' full' : '';
@@ -71,19 +71,22 @@
           <input type="time" name="${f.name}_reg_end" value="${!isCustom && v ? v.split('-')[1] : '17:00'}">
         </div>
         <div class="h-cust" style="display:${isCustom ? 'block' : 'none'};">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;">
           ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d, i) => {
             const dp = parts[i] || (['Sat','Sun'].includes(d) ? 'off' : '09:00-17:00');
             const isOff = dp === 'off';
-            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px" class="h-day-row">
-              <span style="width:35px">${d}</span>
-              <label><input type="checkbox" class="h-off-chk" data-day="${d}" ${isOff ? 'checked' : ''}> Off</label>
-              <div class="h-times" style="display:${isOff ? 'none' : 'block'}">
-                <input type="time" class="h-start" data-day="${d}" value="${isOff ? '09:00' : dp.split('-')[0]}"> to 
-                <input type="time" class="h-end" data-day="${d}" value="${isOff ? '17:00' : dp.split('-')[1]}">
+            return `<div style="display:flex;align-items:center;gap:6px" class="h-day-row">
+              <span style="width:30px;font-size:13px">${d}</span>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px"><input type="checkbox" class="h-off-chk" style="width:16px;height:16px;min-height:16px" data-day="${d}" ${isOff ? 'checked' : ''}> Off</label>
+              <div class="h-times" style="display:${isOff ? 'none' : 'flex'};align-items:center;gap:4px">
+                <input type="time" class="h-start" data-day="${d}" value="${isOff ? '09:00' : dp.split('-')[0]}" style="min-height:32px;padding:2px 6px"> 
+                <span style="font-size:12px;color:var(--ink-2)">to</span>
+                <input type="time" class="h-end" data-day="${d}" value="${isOff ? '17:00' : dp.split('-')[1]}" style="min-height:32px;padding:2px 6px">
               </div>
             </div>`;
           }).join('')}
-          <div style="font-size:0.8em;color:var(--ink-2)" class="h-hint"></div>
+          </div>
+          <div style="font-size:0.8em;color:var(--ink-2);margin-top:8px" class="h-hint"></div>
         </div>
         <input type="hidden" name="${f.name}" value="${esc(v)}">
       </div>`;
@@ -268,7 +271,7 @@
     initImageWidget(form);
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); err.textContent = ''; btn.disabled = true;
-      try { await onSubmit(collect(form, fields)); dlg.close(); } catch (x) { err.textContent = x.message; btn.disabled = false; }
+      try { await onSubmit(collect(form, fields), form); dlg.close(); } catch (x) { err.textContent = x.message; btn.disabled = false; }
     });
     dlg.showModal();
   }
@@ -560,6 +563,7 @@
     tools: [
       { label: 'Onboard store', run: (reload) => formModal({ title: 'Onboard a store', submit: 'Create store', intro: 'Creates the owner login and the store together. Leave the password empty to generate one.', fields: [{ name: 'name', label: 'Owner name', required: true }, { name: 'phone', label: 'Owner phone', required: true }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'password', label: 'Password', type: 'password' }, { name: 'store.name', label: 'Store name', required: true, full: true }, { name: 'store.category', label: 'Category', required: true }, { name: 'store.phone', label: 'Store phone' }, ...addr({}, 'store.address.'), { name: 'store.division', label: 'City Division', type: 'select', options: [['C', 'Center'], ['S', 'South'], ['N', 'North'], ['E', 'East'], ['W', 'West']] }], onSubmit: async (v) => { showTemp(await api('/admin/onboard/mx', { method: 'POST', body: v })); reload(); } }) },
       { label: 'Onboard delivery partner', run: (reload) => formModal({ title: 'Onboard a delivery partner', submit: 'Create partner', intro: 'Leave the password empty to generate one.', fields: [{ name: 'name', label: 'Name', required: true }, { name: 'phone', label: 'Phone', required: true }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'password', label: 'Password', type: 'password' }, { name: 'vehicle.kind', label: 'Vehicle' }, { name: 'vehicle.number', label: 'Vehicle number' }], onSubmit: async (v) => { showTemp(await api('/admin/onboard/dp', { method: 'POST', body: v })); reload(); } }) },
+      { label: 'Bulk upload (CSV)', run: (reload) => formModal({ title: 'Bulk Upload Stores', submit: 'Upload & Onboard', intro: 'Upload a CSV or TSV file to onboard multiple stores at once.', fields: [{ name: 'file', label: 'CSV/TSV File', type: 'file', required: true, full: true }], onSubmit: async (v, form) => { await api('/admin/onboard/bulk', { method: 'POST', body: new FormData(form), isForm: true }); toast('Bulk upload complete'); reload(); } }) }
     ],
     cols: userCols, actions: userActions,
   });

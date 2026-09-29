@@ -208,7 +208,7 @@ dialog[open]::backdrop { animation: fade .25s ease both; }
 .dlg { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); max-height: 90vh; display: flex; flex-direction: column; }
 .dlg > header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); }
 .dlg h2 { font-size: 21px; }
-.dlg-body { padding: 20px 22px; overflow: auto; display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-content: start; }
+.dlg-body { padding: 20px 22px; overflow: auto; display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-content: start; align-items: start; }
 .dlg-body .full { grid-column: 1 / -1; }
 .dlg > footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid var(--line); }
 .kv { display: grid; grid-template-columns: 130px 1fr; gap: 6px 14px; }

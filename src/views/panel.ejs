@@ -17,3 +17,9 @@
 </div>
 <dialog id="modal" aria-modal="true"></dialog>
 <div id="toasts" aria-live="polite"></div>
+
+<% if (typeof clientTemplates !== 'undefined') { %>
+  <% for (const [name, html] of Object.entries(clientTemplates)) { %>
+    <script type="text/template" id="tpl-<%= name %>"><%- html %></script>
+  <% } %>
+<% } %>
